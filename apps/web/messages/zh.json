@@ -1,0 +1,15 @@
+{
+  "Sidebar": {
+    "dashboard": "工作台",
+    "companyIntelligence": "公司情报",
+    "projects": "项目",
+    "playbooks": "执行手册",
+    "workflows": "工作流",
+    "agents": "智能体",
+    "knowledgeBase": "知识库",
+    "businessAcademy": "商学院",
+    "marketplace": "应用市场",
+    "analytics": "数据分析",
+    "settings": "系统设置"
+  }
+}

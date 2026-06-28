@@ -1,0 +1,15 @@
+{
+  "Sidebar": {
+    "dashboard": "Dashboard",
+    "companyIntelligence": "Company Intelligence",
+    "projects": "Projects",
+    "playbooks": "Playbooks",
+    "workflows": "Workflows",
+    "agents": "Agents",
+    "knowledgeBase": "Knowledge Base",
+    "businessAcademy": "Business Academy",
+    "marketplace": "Marketplace",
+    "analytics": "Analytics",
+    "settings": "Settings"
+  }
+}

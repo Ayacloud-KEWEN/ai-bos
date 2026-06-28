@@ -1,0 +1,15 @@
+{
+  "Sidebar": {
+    "dashboard": "Tableau de Bord",
+    "companyIntelligence": "Intelligence d'Entreprise",
+    "projects": "Projets",
+    "playbooks": "Manuels",
+    "workflows": "Flux de Travail",
+    "agents": "Agents",
+    "knowledgeBase": "Base de Connaissances",
+    "businessAcademy": "Académie",
+    "marketplace": "Marché",
+    "analytics": "Analytique",
+    "settings": "Paramètres"
+  }
+}

@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db:
+    image: ankane/pgvector:latest
+    container_name: ai_bos_postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=bos_admin_123
+      - POSTGRES_DB=ai_bos_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - ai_bos_pgdata_v3:/var/lib/postgresql/data
+
+volumes:
+  ai_bos_pgdata_v3:
