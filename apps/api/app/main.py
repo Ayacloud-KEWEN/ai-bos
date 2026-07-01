@@ -76,9 +76,10 @@ app = FastAPI(
 )
 
 # 1. 配置 CORS (跨域)
-origins = [
-    "http://localhost:3000",  # Next.js 本地开发地址
-    # 未来这里可以加上生产环境的域名
+#    生产：设环境变量 CORS_ORIGINS="https://你的域名"（逗号分隔可多个）。
+import os as _os
+origins = ["http://localhost:3000"] + [
+    o.strip() for o in _os.environ.get("CORS_ORIGINS", "").split(",") if o.strip()
 ]
 
 app.add_middleware(

@@ -22,9 +22,27 @@ async def _get_or_create(db: AsyncSession) -> AppSetting:
 
 
 async def load_settings_into_runtime(db: AsyncSession):
-    """启动时调用：把持久化的模型配置载入到 llm 运行时状态。"""
+    """启动时调用：把持久化的模型配置载入到 llm 运行时状态。
+    并从环境变量播种（首次部署便利）：DEEPSEEK_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY /
+    QWEN_API_KEY 填对应 provider 的 key；AIBOS_DEFAULT_PROVIDER 设默认 provider（仅当 DB 未改过）。"""
+    import os
     row = await _get_or_create(db)
     llm.load_state(row.llm_provider, row.llm_providers_config or {})
+
+    for env_key, provider in [("DEEPSEEK_API_KEY", "deepseek"), ("OPENAI_API_KEY", "openai"),
+                              ("ANTHROPIC_API_KEY", "anthropic"), ("QWEN_API_KEY", "qwen")]:
+        val = os.environ.get(env_key)
+        if val:
+            try:
+                llm.update_provider_config(provider, api_key=val)
+            except Exception:
+                pass
+    default = os.environ.get("AIBOS_DEFAULT_PROVIDER")
+    if default and row.llm_provider == "ollama":  # DB 仍是默认，尚未手动改过 → 用 env 默认
+        try:
+            llm.set_provider(default)
+        except Exception:
+            pass
 
 
 class ProviderConfigInput(BaseModel):

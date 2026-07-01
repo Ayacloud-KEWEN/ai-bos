@@ -1,0 +1,26 @@
+# AI-BOS FastAPI 后端 systemd 服务
+# 1) 把下面的 <SITE_USER> 和路径改成你 CloudPanel 站点的实际值
+#    （CloudPanel 站点根一般在 /home/<SITE_USER>/htdocs/<domain>/）
+# 2) 放到 /etc/systemd/system/aibos-api.service
+# 3) sudo systemctl daemon-reload && sudo systemctl enable --now aibos-api
+#
+# 注意：--workers 1 是刻意的——本地 bge 向量模型 + 内存里的 provider 状态每个 worker 各一份，
+#      多 worker 会导致模型重复占内存、设置不同步。并发靠 async + 后台任务即可。
+
+[Unit]
+Description=AI-BOS FastAPI backend
+After=network.target docker.service
+
+[Service]
+Type=simple
+User=<SITE_USER>
+WorkingDirectory=/home/<SITE_USER>/htdocs/<domain>/AI-BOS/apps/api
+EnvironmentFile=/home/<SITE_USER>/htdocs/<domain>/AI-BOS/apps/api/.env
+ExecStart=/home/<SITE_USER>/htdocs/<domain>/AI-BOS/apps/api/venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1
+Restart=always
+RestartSec=5
+# 首次启动会下载 bge 向量模型，给足超时
+TimeoutStartSec=600
+
+[Install]
+WantedBy=multi-user.target

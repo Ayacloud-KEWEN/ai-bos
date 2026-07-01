@@ -1,6 +1,6 @@
 import os
-# 1. 魔法级配置：设置 HuggingFace 国内镜像源，防止向量模型下载被墙导致连接失败
-os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
+# 1. HuggingFace 镜像源：默认走国内镜像（可被环境变量 HF_ENDPOINT 覆盖，海外 VPS 可设为官方源）
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
 import asyncio
 from typing import List, Optional
