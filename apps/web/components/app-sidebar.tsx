@@ -1,8 +1,10 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from 'next-intl';
 import { Link } from "@/i18n/routing"; // 使用 next-intl 包装的 Link
+import { apiClient } from "@/lib/api-client";
 import {
   LayoutDashboard,
   Building2,
@@ -15,6 +17,7 @@ import {
   Store,
   LineChart,
   Settings,
+  LogOut,
 } from "lucide-react";
 
 import {
@@ -32,7 +35,18 @@ import {
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const t = useTranslations('Sidebar');
+  const [me, setMe] = useState<{ username: string | null; auth_required: boolean } | null>(null);
+
+  useEffect(() => {
+    apiClient.get("/auth/me").then((r) => setMe(r as any)).catch(() => {});
+  }, []);
+
+  const logout = () => {
+    localStorage.removeItem("ai_bos_access_token");
+    router.push("/login");
+  };
 
   // 我们将 title 替换为词典文件里的对应键名
   const navigationItems = [
@@ -93,6 +107,14 @@ export function AppSidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+          {me?.auth_required && (
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={logout} tooltip="Log out">
+                <LogOut />
+                <span>{me.username ? `Log out (${me.username})` : "Log out"}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>

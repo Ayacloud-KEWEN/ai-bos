@@ -6,13 +6,14 @@ from jose import jwt, JWTError
 
 # SECRET_KEY / 站点密码从环境变量读（生产必须设 SECRET_KEY 与 APP_PASSWORD）
 SECRET_KEY = os.environ.get("SECRET_KEY", "aya_cloud_bos_super_secret_key_change_me_in_production")
-APP_PASSWORD = os.environ.get("APP_PASSWORD", "")  # 非空才启用全站登录门
+APP_PASSWORD = os.environ.get("APP_PASSWORD", "")  # 共享"破窗"密码（可选）
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # Token 7天有效
 
 
 def auth_enabled() -> bool:
-    return bool(APP_PASSWORD)
+    # 设了共享密码 或 配置了初始管理员 → 启用全站登录门
+    return bool(APP_PASSWORD or os.environ.get("ADMIN_PASSWORD"))
 
 
 def decode_token(token: str) -> Optional[dict]:

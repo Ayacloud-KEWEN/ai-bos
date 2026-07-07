@@ -66,6 +66,19 @@ async def lifespan(app: FastAPI):
         # 载入大模型 Provider 设置到运行时
         from app.api.routers.settings import load_settings_into_runtime
         await load_settings_into_runtime(session)
+
+        # 首启播种管理员（若配置了 ADMIN_USERNAME/ADMIN_PASSWORD 且当前无用户）
+        import os as _o
+        au, ap = _o.environ.get("ADMIN_USERNAME"), _o.environ.get("ADMIN_PASSWORD")
+        if au and ap:
+            from app.models.user import User
+            from app.core.security import get_password_hash
+            n = (await session.execute(text("SELECT count(*) FROM users"))).scalar()
+            if not n:
+                session.add(User(email=au, hashed_password=get_password_hash(ap),
+                                 full_name="Admin", is_superuser=True))
+                await session.commit()
+                print(f"[seed] created admin user {au}")
     yield
 
 app = FastAPI(
@@ -82,11 +95,14 @@ from fastapi.responses import JSONResponse as _JSONResponse
 from app.core.security import auth_enabled as _auth_enabled, decode_token as _decode_token
 
 
+_AUTH_EXEMPT = {"/api/v1/auth/login", "/api/v1/auth/status", "/api/v1/auth/me"}
+
+
 @app.middleware("http")
 async def _auth_gate(request: _Request, call_next):
     if _auth_enabled() and request.method != "OPTIONS":
         p = request.url.path
-        if p.startswith("/api/v1") and not p.startswith("/api/v1/auth"):
+        if p.startswith("/api/v1") and p not in _AUTH_EXEMPT:
             hdr = request.headers.get("Authorization", "")
             token = request.query_params.get("token") or (hdr[7:].strip() if hdr.startswith("Bearer ") else "")
             if not token or _decode_token(token) is None:

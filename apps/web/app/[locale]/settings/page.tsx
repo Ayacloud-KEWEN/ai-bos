@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { UsersSection } from "@/components/settings/users-section";
 
 interface Provider {
   key: string; label: string; needs_key: boolean; model: string; default_model: string; configured: boolean;
@@ -117,6 +118,8 @@ export default function SettingsPage() {
           })}
         </CardContent>
       </Card>
+
+      <UsersSection />
 
       <p className="text-xs text-muted-foreground">
         Tip: DeepSeek is recommended for Chinese filings — cheap, strong Chinese, 64K context, and parallel

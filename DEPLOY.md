@@ -61,8 +61,10 @@ DATABASE_URL=postgresql+psycopg://postgres:你的强密码@127.0.0.1:5435/ai_bos
 CORS_ORIGINS=https://ai-bos.francego.fr
 AIBOS_DEFAULT_PROVIDER=deepseek
 DEEPSEEK_API_KEY=sk-你的key
-APP_PASSWORD=你的访问密码        # 设了才启用全站登录门
-SECRET_KEY=一串随机长密钥        # JWT 签名，生产务必改
+ADMIN_USERNAME=admin@ai-bos.francego.fr  # 首启创建的初始管理员
+ADMIN_PASSWORD=管理员密码                 # 设了它(或APP_PASSWORD)即启用登录门
+SECRET_KEY=一串随机长密钥                 # JWT 签名，生产务必改
+# APP_PASSWORD=                          # 可选：共享破窗密码
 HF_ENDPOINT=https://huggingface.co      # 海外 VPS 用官方源；国内可删掉这行用默认镜像
 ```
 装成 systemd 服务：
@@ -126,6 +128,6 @@ cd ../web && pnpm install && pnpm build   # CloudPanel 会自动重启 Node 应�
 ## 9. 注意事项
 - **数据持久化**：上传文档在 `apps/api/storage/`（已 gitignore，不会被 git pull 覆盖）；数据库在 Docker volume `ai_bos_pgdata_v3`。定期 `docker exec ai_bos_postgres pg_dump ...` 备份。
 - **资源**：首启会下载 bge 模型；OCR/向量化吃内存，内存紧张就升配。DeepSeek 让分析并发更快。
-- **登录门**：`.env` 里设 `APP_PASSWORD` 即启用全站登录（首页会跳 `/login` 要密码）；留空则完全放开。想再加一层可叠加 CloudPanel 的 **Basic Auth**（站点 → Settings）。
+- **登录 / 多用户**：`.env` 设 `ADMIN_USERNAME`/`ADMIN_PASSWORD`（或 `APP_PASSWORD`）即启用全站登录门，首启自动建管理员。登录后可在 **Settings → Users** 增删用户；侧边栏底部有**登出**。留空则完全放开（本地开发）。想再加一层可叠加 CloudPanel 的 **Basic Auth**。
 - **密钥安全**：API Key 存在数据库 `app_settings`，不入代码库；`.env` 已 gitignore。
 - **监控自动化**：如需定时监控，加系统 cron：`*/30 * * * * curl -s -X POST http://127.0.0.1:8000/api/v1/monitoring/run`。
