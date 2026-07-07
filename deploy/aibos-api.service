@@ -1,6 +1,6 @@
 # AI-BOS FastAPI 后端 systemd 服务
 # 1) 把下面的 <SITE_USER> 和路径改成你 CloudPanel 站点的实际值
-#    （CloudPanel 站点根一般在 /home/<SITE_USER>/htdocs/<domain>/）
+#    （CloudPanel 站点根一般在 /home/<SITE_USER>/htdocs/ai-bos.francego.fr/）
 # 2) 放到 /etc/systemd/system/aibos-api.service
 # 3) sudo systemctl daemon-reload && sudo systemctl enable --now aibos-api
 #
@@ -14,9 +14,9 @@ After=network.target docker.service
 [Service]
 Type=simple
 User=<SITE_USER>
-WorkingDirectory=/home/<SITE_USER>/htdocs/<domain>/AI-BOS/apps/api
-EnvironmentFile=/home/<SITE_USER>/htdocs/<domain>/AI-BOS/apps/api/.env
-ExecStart=/home/<SITE_USER>/htdocs/<domain>/AI-BOS/apps/api/venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1
+WorkingDirectory=/home/<SITE_USER>/htdocs/ai-bos.francego.fr/AI-BOS/apps/api
+EnvironmentFile=/home/<SITE_USER>/htdocs/ai-bos.francego.fr/AI-BOS/apps/api/.env
+ExecStart=/home/<SITE_USER>/htdocs/ai-bos.francego.fr/AI-BOS/apps/api/venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1
 Restart=always
 RestartSec=5
 # 首次启动会下载 bge 向量模型，给足超时

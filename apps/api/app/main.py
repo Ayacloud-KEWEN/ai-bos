@@ -78,7 +78,7 @@ app = FastAPI(
 # 1. 配置 CORS (跨域)
 #    生产：设环境变量 CORS_ORIGINS="https://你的域名"（逗号分隔可多个）。
 import os as _os
-origins = ["http://localhost:3000"] + [
+origins = ["http://localhost:3000", "http://localhost:3300"] + [
     o.strip() for o in _os.environ.get("CORS_ORIGINS", "").split(",") if o.strip()
 ]
 

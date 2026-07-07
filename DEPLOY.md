@@ -4,8 +4,8 @@
 PostgreSQL+pgvector 用 Docker，Nginx 由 CloudPanel 反代 + Let's Encrypt。
 AI 分析走 **在线 DeepSeek**（VPS 只跑本地 bge 向量 + OCR），2–4GB 内存即可起步。
 
-> 下文把你的站点用户记为 `<SITE_USER>`、域名记为 `<domain>`，站点根一般是
-> `/home/<SITE_USER>/htdocs/<domain>/`。代码放在该目录下的 `AI-BOS/`。
+> 下文把你的站点用户记为 `<SITE_USER>`、域名记为 `ai-bos.francego.fr`，站点根一般是
+> `/home/<SITE_USER>/htdocs/ai-bos.francego.fr/`。代码放在该目录下的 `AI-BOS/`。
 
 ---
 
@@ -18,7 +18,7 @@ AI 分析走 **在线 DeepSeek**（VPS 只跑本地 bge 向量 + OCR），2–4G
 ---
 
 ## 1. 在 CloudPanel 建站点
-1. **Sites → Add Site → Create a Node.js Site**，域名填 `<domain>`，App Port 填 `3000`，Node 版本选 20+。
+1. **Sites → Add Site → Create a Node.js Site**，域名填 `ai-bos.francego.fr`，App Port 填 `3300`，Node 版本选 20+。
 2. 建站后 **SSL/TLS → Let's Encrypt** 一键签发证书。
 3. 记下站点用户 `<SITE_USER>` 与站点根目录。
 
@@ -27,7 +27,7 @@ AI 分析走 **在线 DeepSeek**（VPS 只跑本地 bge 向量 + OCR），2–4G
 ## 2. 拉代码
 SSH 登录 VPS，切到站点根：
 ```bash
-cd /home/<SITE_USER>/htdocs/<domain>/
+cd /home/<SITE_USER>/htdocs/ai-bos.francego.fr/
 git clone https://github.com/Ayacloud-KEWEN/ai-bos.git AI-BOS
 cd AI-BOS
 ```
@@ -58,7 +58,7 @@ nano .env
 `.env` 关键项：
 ```
 DATABASE_URL=postgresql+psycopg://postgres:你的强密码@127.0.0.1:5435/ai_bos_db
-CORS_ORIGINS=https://<domain>
+CORS_ORIGINS=https://ai-bos.francego.fr
 AIBOS_DEFAULT_PROVIDER=deepseek
 DEEPSEEK_API_KEY=sk-你的key
 HF_ENDPOINT=https://huggingface.co      # 海外 VPS 用官方源；国内可删掉这行用默认镜像
@@ -66,7 +66,7 @@ HF_ENDPOINT=https://huggingface.co      # 海外 VPS 用官方源；国内可删
 装成 systemd 服务：
 ```bash
 # 编辑 deploy/aibos-api.service，把 <SITE_USER> 和路径改成实际值
-sudo cp /home/<SITE_USER>/htdocs/<domain>/AI-BOS/deploy/aibos-api.service /etc/systemd/system/
+sudo cp /home/<SITE_USER>/htdocs/ai-bos.francego.fr/AI-BOS/deploy/aibos-api.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now aibos-api
 sudo systemctl status aibos-api          # 首次启动会下载 bge 向量模型(~500MB)，等它 active
@@ -78,9 +78,9 @@ curl -s http://127.0.0.1:8000/api/v1/companies/sectors   # 通了说明后端 OK
 
 ## 5. 前端 Next.js
 ```bash
-cd /home/<SITE_USER>/htdocs/<domain>/AI-BOS/apps/web
+cd /home/<SITE_USER>/htdocs/ai-bos.francego.fr/AI-BOS/apps/web
 cp .env.example .env.production
-nano .env.production      # NEXT_PUBLIC_API_URL=https://<domain>/api/v1
+nano .env.production      # NEXT_PUBLIC_API_URL=https://ai-bos.francego.fr/api/v1
 pnpm install
 pnpm build
 ```
@@ -88,7 +88,7 @@ pnpm build
 ```
 pnpm start
 ```
-（等价于 `next start -p 3000`）。App Port 保持 3000。保存后 CloudPanel 会常驻它。
+（`package.json` 里已配成 `next start -p 3300`）。App Port 保持 **3300**。保存后 CloudPanel 会常驻它。
 
 ---
 
@@ -102,7 +102,7 @@ CloudPanel **站点 → Vhost 编辑器**，参照 `deploy/nginx-aibos.conf` 在
 ---
 
 ## 7. 首次验收
-1. 打开 `https://<domain>` → 应看到界面。
+1. 打开 `https://ai-bos.francego.fr` → 应看到界面。
 2. **Settings** 页：确认当前 Provider 是 **DeepSeek**（env 已自动播种 key）。若不是，手动切换。
 3. 上传一个 PDF/Word 建档 → 几分钟后财务/竞争/尽调等出结果；或用"Search Online"从 SEC/巨潮/HKEX 联网建档。
 4. Dashboard 点 "Run monitoring"、公司页导出报告/资产，逐个验收。
@@ -111,7 +111,7 @@ CloudPanel **站点 → Vhost 编辑器**，参照 `deploy/nginx-aibos.conf` 在
 
 ## 8. 日常更新
 ```bash
-cd /home/<SITE_USER>/htdocs/<domain>/AI-BOS
+cd /home/<SITE_USER>/htdocs/ai-bos.francego.fr/AI-BOS
 git pull
 # 后端
 cd apps/api && ./venv/bin/pip install -r requirements.txt && sudo systemctl restart aibos-api

@@ -14,13 +14,13 @@
 1. 启动 Docker 里的 PostgreSQL（pgvector）；
 2. 检查本地 Ollama 是否在跑（不在则尝试拉起）；
 3. 在**独立窗口**启动后端（FastAPI / uvicorn，端口 8000）；
-4. 在**独立窗口**启动前端（Next.js，端口 3000）。
+4. 在**独立窗口**启动前端（Next.js，端口 3300）。
 
 两个服务各自一个窗口，方便看日志、按 `Ctrl+C` 单独重启。启动后访问：
 
 | 服务 | 地址 |
 |---|---|
-| 前端 | http://localhost:3000 |
+| 前端 | http://localhost:3300 |
 | 后端 API 文档 (Swagger) | http://localhost:8000/docs |
 | 数据库 | localhost:**5435**（容器内 5432） |
 | Ollama | http://127.0.0.1:11434 |
@@ -174,7 +174,7 @@ ollama pull qwen2.5
 
 | 现象 | 处理 |
 |---|---|
-| 前端报 401/网络错误 | 后端没起或端口不对，确认 8000 在跑、CORS 含 localhost:3000 |
+| 前端报 401/网络错误 | 后端没起或端口不对，确认 8000 在跑、CORS 含 localhost:3300 |
 | 上传后一直 "Analyzing" | 本地 Ollama 在排队/大文档慢；看后端窗口日志；切在线 provider |
 | API 全部超时 (HTTP 000) | 事件循环被阻塞或后台任务堆积；重启后端窗口 |
 | `vector` 扩展报错 | 用的镜像须为 `ankane/pgvector`；启动迁移会 `CREATE EXTENSION` |

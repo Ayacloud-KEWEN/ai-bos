@@ -1,6 +1,6 @@
 # ============================================================
 #  AI-BOS 一键开发启动脚本
-#  启动：PostgreSQL(Docker) + Ollama 检查 + 后端(8000) + 前端(3000)
+#  启动：PostgreSQL(Docker) + Ollama 检查 + 后端(8000) + 前端(3300)
 #  用法：双击 start-dev.bat，或在 PowerShell 运行  ./start-dev.ps1
 # ============================================================
 
@@ -74,11 +74,11 @@ if (-not (Test-Path $uvicorn)) {
     Ok "Backend launching (give it ~20s to load the embedding model)"
 }
 
-# --- 4. 前端 (Next.js, 端口 3000) ----------------------------------------
+# --- 4. 前端 (Next.js, 端口 3300) ----------------------------------------
 Info "Starting frontend (Next.js) in a new window..."
 Start-Process powershell -ArgumentList @(
     "-NoExit", "-Command",
-    "`$Host.UI.RawUI.WindowTitle='AI-BOS Web :3000'; Set-Location '$WebDir'; pnpm dev"
+    "`$Host.UI.RawUI.WindowTitle='AI-BOS Web :3300'; Set-Location '$WebDir'; pnpm dev"
 )
 Ok "Frontend launching"
 
@@ -86,7 +86,7 @@ Ok "Frontend launching"
 Write-Host ""
 Write-Host "============================================" -ForegroundColor Green
 Ok "All services starting in separate windows."
-Write-Host "  Frontend : http://localhost:3000"      -ForegroundColor White
+Write-Host "  Frontend : http://localhost:3300"      -ForegroundColor White
 Write-Host "  API docs : http://localhost:8000/docs"  -ForegroundColor White
 Write-Host "  Database : localhost:5435"              -ForegroundColor White
 Write-Host "============================================" -ForegroundColor Green
