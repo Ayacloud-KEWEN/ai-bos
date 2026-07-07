@@ -76,7 +76,25 @@ SECRET_KEY="${SECRET_KEY:-$(python3 -c 'import secrets;print(secrets.token_urlsa
 # ============================================================================
 log "[后端] 创建 venv 并安装依赖 (首次较慢，会下载 bge 向量模型依赖)…"
 cd "$API_DIR"
-[ -d venv ] || python3 -m venv venv
+# 建 venv；Debian/Ubuntu 上常缺 python3-venv / python3-pip，缺了就自动补装
+if [ ! -x venv/bin/pip ]; then
+  rm -rf venv
+  if ! python3 -m venv venv 2>/tmp/venv_err || [ ! -x venv/bin/pip ]; then
+    warn "venv 创建失败（多半缺 python3-venv）。尝试自动安装系统依赖…"
+    PYVER="$(python3 -c 'import sys;print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
+    if command -v apt-get >/dev/null; then
+      sudo apt-get update -qq
+      sudo apt-get install -y "python${PYVER}-venv" python3-venv python3-pip python3-dev build-essential libpq-dev
+    elif command -v dnf >/dev/null; then
+      sudo dnf install -y python3-venv python3-pip python3-devel gcc postgresql-devel
+    else
+      die "无法自动安装 python venv 依赖，请手动安装 python3-venv 后重跑。错误：$(cat /tmp/venv_err 2>/dev/null)"
+    fi
+    rm -rf venv
+    python3 -m venv venv || die "venv 仍创建失败，请查看 /tmp/venv_err"
+  fi
+fi
+[ -x venv/bin/pip ] || die "venv/bin/pip 不存在，venv 创建异常"
 ./venv/bin/pip install -q -U pip
 ./venv/bin/pip install -q -r requirements.txt
 
