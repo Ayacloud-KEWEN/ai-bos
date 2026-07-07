@@ -151,6 +151,24 @@ $PKG install
 log "[前端] 构建 ($PKG run build)…"
 $PKG run build
 
+# 前端也用 systemd 常驻（新版 CloudPanel 无 App Start Command，自己跑在 3300 端口）
+log "[前端] 安装 systemd 服务 aibos-web (需要 sudo)"
+START_CMD="$(command -v "$PKG") start"
+WEB_TMP="$(mktemp)"
+sed -e "s#<SITE_USER>#${SITE_USER}#g" \
+    -e "s#<WEB_DIR>#${WEB_DIR}#g" \
+    -e "s#<START_CMD>#${START_CMD}#g" \
+    "$REPO_ROOT/deploy/aibos-web.service" > "$WEB_TMP"
+sudo cp "$WEB_TMP" /etc/systemd/system/aibos-web.service
+rm -f "$WEB_TMP"
+sudo systemctl daemon-reload
+sudo systemctl enable --now aibos-web
+for i in $(seq 1 24); do
+  if curl -fs http://127.0.0.1:3300 >/dev/null 2>&1; then log "[前端] ✅ 已就绪 (127.0.0.1:3300)"; break; fi
+  sleep 3
+  [ "$i" = 24 ] && warn "前端未响应，用 'sudo journalctl -u aibos-web -f' 查看"
+done
+
 # ============================================================================
 # 完成
 # ============================================================================
@@ -158,12 +176,11 @@ printf '\n\033[1;32m✔ 安装完成\033[0m\n'
 cat <<DONE
 
 后端： systemd 服务 aibos-api 已启用（127.0.0.1:8000）
-前端： 已构建，启动命令 => $PKG start  （已配置 next start -p 3300）
+前端： systemd 服务 aibos-web 已启用（127.0.0.1:3300）
 
-还剩两步需要在 CloudPanel 面板里手动做：
+CloudPanel 面板里只剩 Nginx 反代要配（无需再设 App Start Command）：
 
-  1) 站点 → Settings → App Start Command 设为:  $PKG start   (App Port = 3300)
-  2) 站点 → Vhost 编辑器，参照 deploy/nginx-aibos.conf 增加:
+  站点 → Vhost 编辑器，参照 deploy/nginx-aibos.conf 增加:
        - client_max_body_size 50M;
        - location /api/ { proxy_pass http://127.0.0.1:8000; ... }   (放在 location / 之前)
      并签发 Let's Encrypt 证书。
@@ -172,6 +189,7 @@ cat <<DONE
 
 常用命令:
   后端日志:   sudo journalctl -u aibos-api -f
-  重启后端:   sudo systemctl restart aibos-api
+  前端日志:   sudo journalctl -u aibos-web -f
+  重启:       sudo systemctl restart aibos-api aibos-web
   更新代码:   git pull && ./deploy/install.sh   (会复用已有 .env)
 DONE

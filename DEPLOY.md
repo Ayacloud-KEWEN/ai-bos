@@ -111,11 +111,20 @@ nano .env.production      # NEXT_PUBLIC_API_URL=https://ai-bos.francego.fr/api/v
 pnpm install
 pnpm build
 ```
-在 CloudPanel **站点 → Settings**，把 **App Start Command** 设为：
+让前端常驻。**新版 CloudPanel 若没有 “App Start Command” 输入框**，就用 systemd（和后端一样，推荐）：
+```bash
+# 编辑 deploy/aibos-web.service，把 <SITE_USER>/<WEB_DIR>/<START_CMD> 改成实际值
+#   WEB_DIR   = .../AI-BOS/apps/web
+#   START_CMD = $(which pnpm) start   或   $(which npm) start
+sudo cp deploy/aibos-web.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now aibos-web
+curl -s http://127.0.0.1:3300 >/dev/null && echo "前端 OK"
 ```
-pnpm start
-```
-（`package.json` 里已配成 `next start -p 3300`）。App Port 保持 **3300**。保存后 CloudPanel 会常驻它。
+> 用一键脚本 `install.sh` 的话，这一步已自动完成，无需手动装。
+>
+> 如果你的 CloudPanel 版本**有** “App Start Command”，也可以改用它：填 `pnpm start`（或 `npm start`），
+> App Port 保持 **3300**；此时就不要再装 aibos-web 服务，二选一即可。
 
 ---
 
