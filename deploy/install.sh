@@ -48,6 +48,16 @@ ask_secret() {
 [ -d "$API_DIR" ] || die "找不到 $API_DIR —— 请在仓库根目录运行本脚本"
 command -v python3 >/dev/null || die "未找到 python3"
 
+# ---- 不要用 root 跑 -------------------------------------------------------
+# 用站点用户跑（该用户需有 sudo 权限）：venv/.env/前端产物才会归站点用户所有，
+# systemd 服务也才会以站点用户身份跑后端。脚本内部装服务时会自己调 sudo。
+if [ "$(id -u)" -eq 0 ] && [ -z "${ALLOW_ROOT:-}" ]; then
+  die "请不要用 root 直接运行。切到 CloudPanel 站点用户再跑，例如：
+       su - <SITE_USER>   然后   cd $REPO_ROOT && ./deploy/install.sh
+     （确有理由必须用 root，可 ALLOW_ROOT=1 强制，但不推荐）"
+fi
+command -v sudo >/dev/null || die "未找到 sudo —— 站点用户需要有 sudo 权限来安装 systemd 服务"
+
 log "站点用户: $SITE_USER"
 log "仓库路径: $REPO_ROOT"
 

@@ -36,8 +36,14 @@ cd AI-BOS
 
 ## ⚡ 一键安装（数据库已就绪后，推荐）
 
-数据库 docker 已在跑的话，后端+前端可以直接用脚本一把梭：
+数据库 docker 已在跑的话，后端+前端可以直接用脚本一把梭。
+
+> ⚠️ **用 CloudPanel 的站点用户跑，别用 root。** 该用户要有 sudo 权限（脚本装 systemd 服务时会自己调
+> sudo）。这样 venv / `.env` / 前端产物才归站点用户所有，后端服务也以站点用户身份运行，更安全。
+> 若当前是 root，先切过去：`su - <SITE_USER>`。
+
 ```bash
+su - <SITE_USER>                       # 若你现在是 root，先切到站点用户
 cd /home/<SITE_USER>/htdocs/ai-bos.francego.fr/AI-BOS
 chmod +x deploy/install.sh
 ./deploy/install.sh          # 交互式，会问域名/DB密码/DeepSeek key/管理员账号
