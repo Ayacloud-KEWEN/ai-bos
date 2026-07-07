@@ -128,7 +128,8 @@ sudo systemctl enable --now aibos-api
 
 log "[后端] 等待启动（首启会下载 ~500MB bge 模型，最多 10 分钟）…"
 for i in $(seq 1 120); do
-  if curl -fs http://127.0.0.1:8000/api/v1/companies/sectors >/dev/null 2>&1; then
+  # 探免登录端点 /auth/status（/companies/* 启用登录门后会 401）
+  if curl -fs http://127.0.0.1:8000/api/v1/auth/status >/dev/null 2>&1; then
     log "[后端] ✅ 已就绪 (127.0.0.1:8000)"; break
   fi
   sleep 5

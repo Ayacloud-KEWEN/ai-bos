@@ -96,7 +96,8 @@ sudo cp /home/<SITE_USER>/htdocs/ai-bos.francego.fr/AI-BOS/deploy/aibos-api.serv
 sudo systemctl daemon-reload
 sudo systemctl enable --now aibos-api
 sudo systemctl status aibos-api          # 首次启动会下载 bge 向量模型(~500MB)，等它 active
-curl -s http://127.0.0.1:8000/api/v1/companies/sectors   # 通了说明后端 OK
+curl -s http://127.0.0.1:8000/api/v1/auth/status   # 返回 {"auth_required":...} 说明后端 OK
+# 注意：启用登录门后 /companies/* 等业务端点会返回 401，这是正常的（需登录），不代表后端没起
 ```
 > ⚠️ 保持 `--workers 1`（unit 里已设）——多 worker 会重复加载模型、设置不同步。
 
