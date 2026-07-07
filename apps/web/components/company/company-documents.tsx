@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Doc { id: string; filename: string; size: number; uploaded_at: string | null; }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+import { fileUrl } from "@/lib/file-url";
 
 function fmtSize(b: number): string {
   if (!b) return "";
@@ -36,7 +36,7 @@ export function CompanyDocuments({ companyId }: { companyId: string }) {
         {docs.map((d) => (
           <a
             key={d.id}
-            href={`${API_BASE}/companies/${companyId}/documents/${d.id}/file`}
+            href={fileUrl(`/companies/${companyId}/documents/${d.id}/file`)}
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-3 rounded-lg border p-3 transition-colors hover:border-primary/40 hover:bg-muted/30"

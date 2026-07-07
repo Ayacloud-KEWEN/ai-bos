@@ -21,9 +21,8 @@ import { MarketDashboard } from "@/components/market/market-dashboard";
 import { CompanyDocuments } from "@/components/company/company-documents";
 import { CompanyChat } from "@/components/company/company-chat";
 import { CompanyQuote } from "@/components/company/company-quote";
+import { fileUrl } from "@/lib/file-url";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
 export default function CompanyDetailPage() {
   const params = useParams();
@@ -62,7 +61,7 @@ export default function CompanyDetailPage() {
               <Button
                 variant="outline"
                 className="gap-2"
-                onClick={() => window.open(`${API_BASE}/companies/${companyId}/report`, "_blank")}
+                onClick={() => window.open(fileUrl(`/companies/${companyId}/report`), "_blank")}
               >
                 <FileDown className="h-4 w-4" /> Export Report
               </Button>
@@ -73,10 +72,10 @@ export default function CompanyDetailPage() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Generate deliverable</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => window.open(`${API_BASE}/companies/${companyId}/assets/investor-memo.docx`, "_blank")}><FileTextIcon className="mr-2 h-4 w-4" /> Investor Memo (Word)</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => window.open(`${API_BASE}/companies/${companyId}/assets/sales-deck.pptx`, "_blank")}><Presentation className="mr-2 h-4 w-4" /> Sales Deck (PPT)</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => window.open(`${API_BASE}/companies/${companyId}/assets/battlecard.docx`, "_blank")}><Swords className="mr-2 h-4 w-4" /> Battlecard (Word)</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => window.open(`${API_BASE}/companies/${companyId}/assets/outreach-email.txt`, "_blank")}><Mail className="mr-2 h-4 w-4" /> Outreach Email (Text)</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.open(fileUrl(`/companies/${companyId}/assets/investor-memo.docx`), "_blank")}><FileTextIcon className="mr-2 h-4 w-4" /> Investor Memo (Word)</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.open(fileUrl(`/companies/${companyId}/assets/sales-deck.pptx`), "_blank")}><Presentation className="mr-2 h-4 w-4" /> Sales Deck (PPT)</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.open(fileUrl(`/companies/${companyId}/assets/battlecard.docx`), "_blank")}><Swords className="mr-2 h-4 w-4" /> Battlecard (Word)</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.open(fileUrl(`/companies/${companyId}/assets/outreach-email.txt`), "_blank")}><Mail className="mr-2 h-4 w-4" /> Outreach Email (Text)</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <div className="text-right bg-primary/5 p-4 rounded-xl border border-primary/10">

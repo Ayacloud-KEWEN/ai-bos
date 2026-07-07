@@ -40,12 +40,13 @@ apiClient.interceptors.response.use(
     if (error.response) {
       const status = error.response.status;
 
-      // 401 身份过期：直接踢回登录页并清空失效 Token
+      // 401 未登录/过期：清空 Token 并跳转登录页（避免在登录页自身循环）
       if (status === 401) {
         if (typeof window !== "undefined") {
           localStorage.removeItem("ai_bos_access_token");
-          // 注意：由于多语言的存在，未来可能需要重定向到对应语言的 /login
-          window.location.href = "/"; 
+          if (!window.location.pathname.endsWith("/login")) {
+            window.location.href = "/login";
+          }
         }
       }
       

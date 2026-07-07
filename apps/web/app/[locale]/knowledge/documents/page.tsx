@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+import { fileUrl } from "@/lib/file-url";
 
 interface Doc { id: string; title: string; filename: string; size: number; chunk_count: number; status: string; }
 
@@ -77,7 +77,7 @@ export default function KnowledgeBasePage() {
                 docs.map((d) => (
                   <div key={d.id} className="flex items-center gap-3 rounded-lg border p-3">
                     <FileText className="h-5 w-5 shrink-0 text-rose-500" />
-                    <a href={`${API_BASE}/knowledge/documents/${d.id}/file`} target="_blank" rel="noopener noreferrer" className="min-w-0 flex-1 hover:underline">
+                    <a href={fileUrl(`/knowledge/documents/${d.id}/file`)} target="_blank" rel="noopener noreferrer" className="min-w-0 flex-1 hover:underline">
                       <p className="truncate text-sm font-medium">{d.title}</p>
                       <p className="text-xs text-muted-foreground">{d.chunk_count} chunks</p>
                     </a>

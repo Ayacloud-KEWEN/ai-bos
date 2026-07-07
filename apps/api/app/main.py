@@ -75,6 +75,25 @@ app = FastAPI(
     lifespan=lifespan, # 挂载生命周期
 )
 
+# 0. 全站登录门（仅当设了 APP_PASSWORD 才启用）。
+#    支持 Header Bearer 或 ?token=（文件下载链接在新标签打开无法带 Header，用 query 兜底）。
+from fastapi import Request as _Request
+from fastapi.responses import JSONResponse as _JSONResponse
+from app.core.security import auth_enabled as _auth_enabled, decode_token as _decode_token
+
+
+@app.middleware("http")
+async def _auth_gate(request: _Request, call_next):
+    if _auth_enabled() and request.method != "OPTIONS":
+        p = request.url.path
+        if p.startswith("/api/v1") and not p.startswith("/api/v1/auth"):
+            hdr = request.headers.get("Authorization", "")
+            token = request.query_params.get("token") or (hdr[7:].strip() if hdr.startswith("Bearer ") else "")
+            if not token or _decode_token(token) is None:
+                return _JSONResponse({"detail": "Not authenticated"}, status_code=401)
+    return await call_next(request)
+
+
 # 1. 配置 CORS (跨域)
 #    生产：设环境变量 CORS_ORIGINS="https://你的域名"（逗号分隔可多个）。
 import os as _os
