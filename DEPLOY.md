@@ -34,6 +34,22 @@ cd AI-BOS
 
 ---
 
+## ⚡ 一键安装（数据库已就绪后，推荐）
+
+数据库 docker 已在跑的话，后端+前端可以直接用脚本一把梭：
+```bash
+cd /home/<SITE_USER>/htdocs/ai-bos.francego.fr/AI-BOS
+chmod +x deploy/install.sh
+./deploy/install.sh          # 交互式，会问域名/DB密码/DeepSeek key/管理员账号
+```
+脚本会：建 venv 装后端依赖 → 写 `apps/api/.env` → 安装并启动 systemd 服务 `aibos-api`
+→ 写前端 `.env.production` → `pnpm install && build`。跑完只剩 CloudPanel 面板里两步手动操作
+（设 App Start Command = `pnpm start`；Vhost 加 `client_max_body_size` 和 `/api/` 反代 + 签证书）。
+
+> 想手动逐步来 / 排查问题，就照下面第 3–7 节。更新代码后重跑 `./deploy/install.sh` 会复用已有 `.env`。
+
+---
+
 ## 3. 数据库（PostgreSQL + pgvector，Docker）
 ```bash
 # 生产请先改 docker-compose.yml 里的 POSTGRES_PASSWORD 为强密码

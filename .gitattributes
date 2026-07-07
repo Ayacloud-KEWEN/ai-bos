@@ -1,0 +1,5 @@
+# Shell scripts and Linux deploy configs must keep LF endings, even on Windows,
+# otherwise bash/systemd on the VPS chokes on the stray \r.
+*.sh            text eol=lf
+*.service       text eol=lf
+deploy/*.conf   text eol=lf
